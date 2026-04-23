@@ -167,8 +167,8 @@ def build_model_candidates() -> Dict[str, tuple]:
         ),
     }
 
-    if XGBRegressor is None or LGBMRegressor is None:
-        raise RuntimeError("Required model engines unavailable.")
+    if XGBRegressor is None:
+        raise RuntimeError("XGBoost is required. Install xgboost to run the app.")
 
     candidates["XGBoost"] = (
         XGBRegressor(
@@ -186,19 +186,20 @@ def build_model_candidates() -> Dict[str, tuple]:
         "via C++ implementation. Best single model on this dataset.",
     )
 
-    candidates["LightGBM"] = (
-        LGBMRegressor(
-            n_estimators=400,
-            learning_rate=0.05,
-            max_depth=-1,
-            num_leaves=31,
-            verbose=-1,
-            random_state=42,
-        ),
-        "Microsoft's leaf-wise tree growing strategy. Faster than XGBoost on "
-        "large datasets; comparable accuracy on small ones. Excellent when "
-        "training time is a constraint.",
-    )
+    if LGBMRegressor is not None:
+        candidates["LightGBM"] = (
+            LGBMRegressor(
+                n_estimators=400,
+                learning_rate=0.05,
+                max_depth=-1,
+                num_leaves=31,
+                verbose=-1,
+                random_state=42,
+            ),
+            "Microsoft's leaf-wise tree growing strategy. Faster than XGBoost on "
+            "large datasets; comparable accuracy on small ones. Excellent when "
+            "training time is a constraint.",
+        )
 
     return candidates
 

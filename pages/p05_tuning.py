@@ -40,11 +40,13 @@ from sklearn.pipeline import Pipeline
 from utils.model_trainer import build_model_candidates, build_preprocessor
 from utils.ui_components import insight_box, page_header, section_title, tech_decision_box
 
+WANDB_IMPORT_ERROR = ""
 try:
     import wandb
     WANDB_AVAILABLE = True
-except ImportError:
+except Exception as exc:
     WANDB_AVAILABLE = False
+    WANDB_IMPORT_ERROR = str(exc)
 
 TARGET_COL = "charges"
 
@@ -95,6 +97,8 @@ PARAM_DESCRIPTIONS = {
 
 def _wandb_status() -> tuple[bool, str]:
     if not WANDB_AVAILABLE:
+        if WANDB_IMPORT_ERROR:
+            return False, f"wandb unavailable — {WANDB_IMPORT_ERROR}"
         return False, "wandb not installed — run `pip install wandb`"
     if not os.environ.get("WANDB_API_KEY"):
         return False, "WANDB_API_KEY not set — run `export WANDB_API_KEY=your_key`"
